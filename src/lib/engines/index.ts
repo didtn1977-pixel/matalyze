@@ -8,10 +8,12 @@ export interface CostResult {
 }
 
 export interface BoundingBox {
-  min: { x: number; y: number; z: number };
-  max: { x: number; y: number; z: number };
   width: number;
   height: number;
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
 }
 
 /**
@@ -32,7 +34,7 @@ export abstract class BaseEngine {
 
   abstract calculateCost(
     totalLength: number,
-    boundingBox: { width: number, height: number, min?: any, max?: any },
+    boundingBox: BoundingBox,
     options: any
   ): CostResult;
 }
@@ -41,7 +43,7 @@ export abstract class BaseEngine {
  * 레이저 커팅 엔진 (Laser Cutting Engine)
  */
 export class LaserEngine extends BaseEngine {
-  calculateCost(totalLength: number, boundingBox: { width: number, height: number }, options: { 
+  calculateCost(totalLength: number, boundingBox: BoundingBox, options: { 
     gas?: string; 
     piercingCount?: number;
     customSetupCost?: number;
@@ -103,7 +105,7 @@ export class SheetMetalEngine extends LaserEngine {
  * MCT(밀링) 엔진 (MCT Milling Engine)
  */
 export class MCTEngine extends BaseEngine {
-  calculateCost(totalLength: number, boundingBox: { width: number, height: number }, options: { 
+  calculateCost(totalLength: number, boundingBox: BoundingBox, options: { 
     holeCount?: number; 
     stage?: 'rough' | 'finish';
     customSetupCost?: number;
@@ -141,7 +143,7 @@ export class MCTEngine extends BaseEngine {
  */
 export class CNCLatheEngine extends BaseEngine {
   calculateCost(totalLength: number, boundingBox: BoundingBox, options: { 
-    isIDMachining: boolean;
+    isIDMachining?: boolean;
     customSetupCost?: number;
     customMaterialPrice?: number;
     customProcessPrice?: number; // 시간당 임률로 사용
@@ -153,7 +155,7 @@ export class CNCLatheEngine extends BaseEngine {
     const hourlyRate = options.customProcessPrice ?? PROCESS_COSTS.CNC_LATHE_HOURLY_RATE;
 
     // 회전체 부피 계산: Max Y를 반지름으로 보고 계산 (PI * R^2 * L)
-    const r = Math.max(Math.abs(boundingBox.max.y), Math.abs(boundingBox.min.y));
+    const r = Math.max(Math.abs(boundingBox.maxY), Math.abs(boundingBox.minY));
     const length = boundingBox.width;
     const volumeCm3 = (Math.PI * Math.pow(r, 2) * length) / 1000;
     const materialWeightKg = (volumeCm3 * material.density) / 1000;

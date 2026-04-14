@@ -44,13 +44,13 @@ export class DxfProcessor {
       let length = 0;
 
       if (entity.type === 'LINE') {
-        const pts = entity.vertices || [];
+        const pts = (entity as any).vertices || [];
         if (pts.length >= 2) {
           pts.forEach((v: any) => this.updateBounds(v, min, max));
           length = Math.sqrt(Math.pow(pts[1].x-pts[0].x, 2) + Math.pow(pts[1].y-pts[0].y, 2));
         }
       } else if (entity.type === 'LWPOLYLINE' || entity.type === 'POLYLINE') {
-        const pts = entity.vertices || [];
+        const pts = (entity as any).vertices || [];
         if (pts.length > 0) {
           for (let i = 0; i < pts.length; i++) {
             const p1 = pts[i];
@@ -69,7 +69,7 @@ export class DxfProcessor {
                 length += arcData.length;
                 this.updateArcBounds(arcData, min, max);
               }
-            } else if (entity.shape && pts.length > 2) {
+            } else if ((entity as any).shape && pts.length > 2) {
               // 닫힌 폴리라인의 마지막 연결
               const p2 = pts[0];
               const bulge = p1.bulge || 0;
@@ -85,16 +85,16 @@ export class DxfProcessor {
         }
       } else if (entity.type === 'ARC' || entity.type === 'CIRCLE') {
         if (entity.type === 'CIRCLE') {
-          length = 2 * Math.PI * entity.radius;
-          this.updateBounds(entity.center, min, max, entity.radius);
+          length = 2 * Math.PI * (entity as any).radius;
+          this.updateBounds((entity as any).center, min, max, (entity as any).radius);
         } else {
-          const startAngle = entity.startAngle;
-          const endAngle = entity.endAngle;
+          const startAngle = (entity as any).startAngle;
+          const endAngle = (entity as any).endAngle;
           const angleDiff = endAngle > startAngle ? endAngle - startAngle : (360 - startAngle) + endAngle;
-          length = (2 * Math.PI * entity.radius * (angleDiff / 360));
+          length = (2 * Math.PI * (entity as any).radius * (angleDiff / 360));
           this.updateArcBounds({
-            center: entity.center,
-            radius: entity.radius,
+            center: (entity as any).center,
+            radius: (entity as any).radius,
             startAngle: startAngle * Math.PI / 180,
             endAngle: endAngle * Math.PI / 180
           }, min, max);
@@ -109,7 +109,7 @@ export class DxfProcessor {
         entity,
         bounds: { min, max },
         length,
-        center: entity.center || (entity.vertices ? entity.vertices[0] : {x:0, y:0})
+        center: (entity as any).center || ((entity as any).vertices ? (entity as any).vertices[0] : {x:0, y:0})
       };
     });
 

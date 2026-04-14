@@ -42,10 +42,20 @@ export const useDxfEstimator = () => {
         maxX = Math.max(maxX, e.bounds.maxX); maxY = Math.max(maxY, e.bounds.maxY);
       }
     });
+
+    const finalMinX = minX === Infinity ? 0 : minX;
+    const finalMinY = minY === Infinity ? 0 : minY;
+    const finalMaxX = maxX === Infinity ? 0 : maxX;
+    const finalMaxY = maxY === Infinity ? 0 : maxY;
+
     return {
       totalLength: len,
-      width: minX === Infinity ? 0 : maxX - minX,
-      height: minY === Infinity ? 0 : maxY - minY
+      width: finalMaxX - finalMinX,
+      height: finalMaxY - finalMinY,
+      minX: finalMinX,
+      minY: finalMinY,
+      maxX: finalMaxX,
+      maxY: finalMaxY
     };
   }, [entities, selectedIds]);
 
@@ -60,7 +70,16 @@ export const useDxfEstimator = () => {
       default: engine = new LaserEngine(options.material, options.thickness);
     }
     
-    return engine.calculateCost(currentStats.totalLength, { width: currentStats.width, height: currentStats.height }, {
+    const boundingBox = {
+      width: currentStats.width,
+      height: currentStats.height,
+      minX: currentStats.minX,
+      minY: currentStats.minY,
+      maxX: currentStats.maxX,
+      maxY: currentStats.maxY
+    };
+
+    return engine.calculateCost(currentStats.totalLength, boundingBox, {
       ...options,
       customSetupCost: options.customSetupCost,
       customMaterialPrice: options.customMaterialPrice,
