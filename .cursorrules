@@ -1,0 +1,31 @@
+1. 기술 스택 및 아키텍처 원칙
+Stack: Next.js 14 (App Router), Tailwind CSS, TypeScript, Lucide-react.
+
+UI Pattern: 모든 페이지는 '모듈화된 컴포넌트'로 분리할 것. app/page.tsx는 레이아웃 구조만 잡고, 로직은 별도 hook이나 component로 관리한다.
+
+Design System: 다크 모드 테마를 기본으로 하며, 배경은 bg-[#0b1120], 카드는 bg-[#161f32], 포인트는 text-blue-400을 사용한다.
+
+2. DXF 정밀 렌더링 수칙 (오류 방지 핵심)
+Geometry Rule: DXF 엔티티 파싱 시 반드시 다음 수학적 검증을 거칠 것.
+
+Angle: 모든 각도는 Degree에서 Radian으로 변환 시 (deg * Math.PI) / 180 공식을 사용한다.
+
+Arc Logic: startAngle === endAngle 일 때만 full circle로 간주한다. 그 외의 모든 경우는 ctx.arc()를 사용해 호(Arc)로 정밀 렌더링한다.
+
+Consistency: CAD의 Y축(상향)과 Canvas의 Y축(하향) 반전 로직을 모든 좌표 계산에 일관되게 적용한다.
+
+Filtering: 가공 길이 계산 시 사용자가 선택한(selectedEntityIds) 객체만 합산하며, 선택되지 않은 객체는 투명도를 낮춰 렌더링한다.
+
+3. 코딩 습관 및 검증 (Zero-Tolerance)
+Verification: 코드를 생성하기 전, 스스로 로직의 취약점(부동 소수점 오차, 각도 계산 오류 등)을 3단계로 내부 검토한 뒤 출력한다.
+
+No Hallucination: 존재하지 않는 라이브러리 함수를 지어내지 말고, dxf-parser 공식 문서를 준수한다.
+
+Visual Precision: 시각적 요소(색상, 간격, 폰트 크기)는 사용자가 제공한 디자인 시안(Dashboard Layout)을 100% 재현하는 것을 최우선으로 한다.
+### DXF ARC RENDERING STRICT RULE
+- `dxf-parser`에서 가져온 `ARC` 엔티티는 반드시 다음 수식을 따른다.
+- 시작/끝 각도 변환: `rad = -(deg * Math.PI) / 180` (Y축 반전 필수 반영).
+- Canvas API 호출: `ctx.arc(x, y, r, startRad, endRad, true)`. 
+- 마지막 인자인 `anticlockwise`는 반드시 `true`로 고정한다.
+- 호가 180도일 때 원으로 그려지는 현상을 방지하기 위해 `startAngle === endAngle` 조건문 사용을 금지하며, 각도 차이가 360미만이면 무조건 `arc`를 사용한다.
+- 선 두께(`lineWidth`)는 최소 `1 / scale` 이상을 유지하여 줌 아웃 시에도 사라지지 않게 한다.
