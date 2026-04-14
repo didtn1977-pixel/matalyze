@@ -142,7 +142,7 @@ export class DxfAnalyzer {
     };
   }
 
-  private addArcExtremes(center: any, radius: number, s: number, en: number, update: (x: number, y: number) => void) {
+  private addArcExtremes(center: {x: number, y: number}, radius: number, s: number, en: number, update: (x: number, y: number) => void) {
     const isAngleBetween = (a: number, start: number, end: number) => {
       a = (a % 360 + 360) % 360; start = (start % 360 + 360) % 360; end = (end % 360 + 360) % 360;
       return start <= end ? (a >= start && a <= end) : (a >= start || a <= end);
@@ -154,7 +154,7 @@ export class DxfAnalyzer {
     if (isAngleBetween(270, s, en)) update(center.x, center.y - radius);
   }
 
-  private addBulgeExtremes(p1: any, p2: any, bulge: number, update: (x: number, y: number) => void) {
+  private addBulgeExtremes(p1: {x: number, y: number, bulge?: number}, p2: {x: number, y: number}, bulge: number, update: (x: number, y: number) => void) {
     const L = Math.sqrt((p2.x-p1.x)**2 + (p2.y-p1.y)**2);
     if (L === 0) return;
     const r = (L/2) * (1+bulge**2) / (2*Math.abs(bulge));

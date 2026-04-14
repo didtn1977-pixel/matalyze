@@ -32,7 +32,7 @@ export abstract class BaseEngine {
 
   abstract calculateCost(
     totalLength: number,
-    boundingBox: BoundingBox,
+    boundingBox: { width: number, height: number, min?: any, max?: any },
     options: any
   ): CostResult;
 }
@@ -41,8 +41,8 @@ export abstract class BaseEngine {
  * 레이저 커팅 엔진 (Laser Cutting Engine)
  */
 export class LaserEngine extends BaseEngine {
-  calculateCost(totalLength: number, boundingBox: BoundingBox, options: { 
-    gas: string; 
+  calculateCost(totalLength: number, boundingBox: { width: number, height: number }, options: { 
+    gas?: string; 
     piercingCount?: number;
     customSetupCost?: number;
     customMaterialPrice?: number;
@@ -103,9 +103,9 @@ export class SheetMetalEngine extends LaserEngine {
  * MCT(밀링) 엔진 (MCT Milling Engine)
  */
 export class MCTEngine extends BaseEngine {
-  calculateCost(totalLength: number, boundingBox: BoundingBox, options: { 
-    holeCount: number; 
-    stage: 'rough' | 'finish';
+  calculateCost(totalLength: number, boundingBox: { width: number, height: number }, options: { 
+    holeCount?: number; 
+    stage?: 'rough' | 'finish';
     customSetupCost?: number;
     customMaterialPrice?: number;
     customProcessPrice?: number; // 시간당 임률로 사용
@@ -161,6 +161,8 @@ export class CNCLatheEngine extends BaseEngine {
 
     // 가공비: 내경 가공 여부에 따른 가중치
     const idMultiplier = options.isIDMachining ? 1.3 : 1.0;
+    const laborCost = Math.round(hourlyRate * idMultiplier);
+
     return {
       totalCost: setupCost + materialCost + laborCost,
       materialCost,

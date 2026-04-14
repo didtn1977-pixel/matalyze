@@ -19,7 +19,7 @@ interface Transform {
 /**
  * [수학적 핵심 유틸리티]
  */
-const distToSegment = (px: number, py: number, v: any, w: any) => {
+const distToSegment = (px: number, py: number, v: {x: number, y: number}, w: {x: number, y: number}) => {
   const l2 = (v.x - w.x)**2 + (v.y - w.y)**2;
   if (l2 === 0) return Math.sqrt((px-v.x)**2 + (py-v.y)**2);
   let t = ((px-v.x)*(w.x-v.x) + (py-v.y)*(w.y-v.y)) / l2;
@@ -257,7 +257,14 @@ const CanvasViewer: React.FC<CanvasViewerProps> = ({ entities, selectedIds, onSe
   );
 };
 
-function ToolbarBtn({ icon, label, onClick, active }: any) {
+interface ToolbarBtnProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+  active?: boolean;
+}
+
+function ToolbarBtn({ icon, label, onClick, active }: ToolbarBtnProps) {
   return (
     <button onClick={onClick} className={`p-2 rounded-xl transition-all flex items-center gap-2 group/btn relative ${active ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20' : 'text-slate-400 hover:bg-white/10 hover:text-blue-400'}`}>
       {icon} <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[9px] font-bold rounded opacity-0 group-hover/btn:opacity-100 transition-opacity whitespace-nowrap border border-white/5">{label}</span>
@@ -265,9 +272,15 @@ function ToolbarBtn({ icon, label, onClick, active }: any) {
   );
 }
 
-function StatusBadge({ icon, label, color }: any) {
+interface StatusBadgeProps {
+  icon?: React.ReactNode;
+  label: string;
+  color: 'blue' | 'green';
+}
+
+function StatusBadge({ icon, label, color }: StatusBadgeProps) {
   const colors: Record<string, string> = { blue: 'text-blue-400 bg-blue-500/10 border-blue-500/20', green: 'text-green-400 bg-green-500/10 border-green-500/20' };
-  return (<div className={`px-4 py-2 rounded-xl backdrop-blur-md border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${colors[color] as any}`}>{icon} {label}</div>);
+  return (<div className={`px-4 py-2 rounded-xl backdrop-blur-md border flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${colors[color]}`}> {icon} {label}</div>);
 }
 
 export default CanvasViewer;

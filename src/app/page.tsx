@@ -123,9 +123,9 @@ export default function MetalyzeDashboard() {
           
           <div className="space-y-7 bg-white/2 pb-8 px-2">
             <div className="text-[10px] font-black uppercase text-blue-400 tracking-widest flex items-center gap-2 mb-2"><div className="w-1 h-3 bg-blue-400 rounded-full" /> Parametric Overrides</div>
-            <SimGroup label="Fix Setup Fee" value={`₩${options.customSetupCost.toLocaleString()}`} val={options.customSetupCost} min={0} max={200000} step={5000} onChange={v => setOptions({...options, customSetupCost: v})} />
-            <SimGroup label="Material Cost / kg" value={`₩${options.customMaterialPrice.toLocaleString()}`} val={options.customMaterialPrice} min={0} max={15000} step={100} onChange={v => setOptions({...options, customMaterialPrice: v})} />
-            <SimGroup label="Machining Cost / mm" value={`₩${options.customProcessPrice}`} val={options.customProcessPrice} min={0} max={100} step={1} onChange={v => setOptions({...options, customProcessPrice: v})} />
+            <SimGroup label="Fix Setup Fee" value={`₩${options.customSetupCost.toLocaleString()}`} val={options.customSetupCost} min={0} max={200000} step={5000} onChange={(v: number) => setOptions({...options, customSetupCost: v})} />
+            <SimGroup label="Material Cost / kg" value={`₩${options.customMaterialPrice.toLocaleString()}`} val={options.customMaterialPrice} min={0} max={15000} step={100} onChange={(v: number) => setOptions({...options, customMaterialPrice: v})} />
+            <SimGroup label="Machining Cost / mm" value={`₩${options.customProcessPrice}`} val={options.customProcessPrice} min={0} max={100} step={1} onChange={(v: number) => setOptions({...options, customProcessPrice: v})} />
           </div>
 
           <div className="mt-auto space-y-3.5 pt-8 border-t border-white/10 px-1">
@@ -142,13 +142,38 @@ export default function MetalyzeDashboard() {
   );
 }
 
-// 서브 컴포넌트
+// 서브 컴포넌트 타입 정의
+interface SectionHeaderProps {
+  icon: React.ReactNode;
+  title: string;
+  className?: string;
+}
 
-function SectionHeader({ icon, title, className = "" }: any) {
+interface StatCardProps {
+  label: string;
+  value: React.ReactNode;
+}
+
+interface SimGroupProps {
+  label: string;
+  value: string;
+  val: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+}
+
+interface PriceLineProps {
+  label: string;
+  val?: number;
+}
+
+function SectionHeader({ icon, title, className = "" }: SectionHeaderProps) {
   return (<div className={`text-[10px] uppercase font-black tracking-widest text-blue-400 mb-5 flex items-center gap-2 ${className}`}>{icon} {title}</div>);
 }
 
-function ProcessItem({ id, title, sub, icon, active, onClick }: { id: ProcessType, title: string, sub: string, icon: any, active: boolean, onClick: any }) {
+function ProcessItem({ id, title, sub, icon, active, onClick }: { id: ProcessType, title: string, sub: string, icon: any, active: boolean, onClick: (id: ProcessType) => void }) {
   return (
     <div className={`proc-card ${active ? 'active shadow-lg shadow-blue-500/10' : 'hover:bg-white/[0.04]'}`} onClick={() => onClick(id)}>
       <div className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${active ? 'bg-blue-500 text-white shadow-xl shadow-blue-500/40 translate-x-1 outline outline-4 outline-blue-500/10' : 'bg-black/50 text-slate-500'}`}>{icon}</div>
@@ -157,14 +182,14 @@ function ProcessItem({ id, title, sub, icon, active, onClick }: { id: ProcessTyp
   );
 }
 
-function StatCard({ label, value }: any) {
+function StatCard({ label, value }: StatCardProps) {
   return (<div className="stat-card ring-1 ring-white/5 hover:ring-white/10 transition-all shadow-xl"><div className="text-[9px] font-black text-slate-500 uppercase mb-2 tracking-widest">{label}</div><div className="text-[19px] font-black text-blue-400 tracking-tighter leading-none">{value}</div></div>);
 }
 
-function SimGroup({ label, value, val, min, max, step, onChange }: any) {
+function SimGroup({ label, value, val, min, max, step, onChange }: SimGroupProps) {
   return (<div className="space-y-2.5"><div className="flex justify-between text-[11px] font-bold tracking-tight"><span className="text-slate-400">{label}</span><span className="text-blue-400 font-black">{value}</span></div><input type="range" min={min} max={max} step={step} value={val} onChange={e => onChange(parseInt(e.target.value))} /></div>);
 }
 
-function PriceLine({ label, val }: any) {
+function PriceLine({ label, val }: PriceLineProps) {
   return (<div className="flex justify-between text-xs font-bold py-1.5"><span className="text-slate-500 uppercase tracking-wide">{label}</span><span className="text-slate-200">₩{(val || 0).toLocaleString()}</span></div>);
 }
