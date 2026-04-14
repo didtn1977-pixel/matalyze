@@ -210,7 +210,7 @@ const CanvasViewer: React.FC<CanvasViewerProps> = ({ entities, selectedIds, onSe
 
       if (Math.abs(boxStart.x - boxEnd.x) < 5) {
         const mx = (boxStart.x - cx) / s, my = (cy - boxStart.y) / s;
-        let best = null, dM = 15 / s;
+        let best: PrecisionEntity | null = null, dM = 15 / s;
         entities.forEach(ent => {
           const e_ = ent.raw;
           let d = Infinity;
@@ -218,7 +218,7 @@ const CanvasViewer: React.FC<CanvasViewerProps> = ({ entities, selectedIds, onSe
           else if (ent.type === 'CIRCLE' || ent.type === 'ARC') d = Math.abs(Math.sqrt((mx-e_.center.x)**2 + (my-e_.center.y)**2) - e_.radius);
           if (d < dM) { dM = d; best = ent; }
         });
-        if (best) newlySelected.add(best.id);
+        if (best) newlySelected.add((best as PrecisionEntity).id);
       }
 
       if (e.ctrlKey) {
