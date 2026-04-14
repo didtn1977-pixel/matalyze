@@ -206,7 +206,7 @@ const DxfViewer: React.FC<DxfViewerProps> = ({ dxfContent, selectedEntityIds, on
     const worldX = (mx - x) / scale;
     const worldY = (my - y) / -scale;
 
-    let closest = null;
+    let closest: any = null;
     let minDist = 12 / scale;
 
     entities.forEach((entity: any) => {
@@ -321,7 +321,13 @@ const DxfViewer: React.FC<DxfViewerProps> = ({ dxfContent, selectedEntityIds, on
   );
 };
 
-function ToolbarBtn({ icon, label, onClick }: any) {
+interface ToolbarBtnProps {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}
+
+function ToolbarBtn({ icon, label, onClick }: ToolbarBtnProps) {
   return (
     <button 
       onClick={onClick}
